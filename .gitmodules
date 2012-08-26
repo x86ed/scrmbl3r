@@ -1,0 +1,3 @@
+[submodule "src/server/lib/tornado"]
+	path = src/server/lib/tornado
+	url = git://github.com/facebook/tornado.git
