@@ -1,5 +1,10 @@
+#! /usr/bin/python
+
 import os
+import random
 import re
+
+from helpers import findInList
 
 def getpeople(chat):
     _people_re = re.compile('[a-z]{1,12}:')
@@ -20,9 +25,9 @@ def msgcheck(msg):
         for i in range(len(_msgarray)):
             if _msgarray[i] and i == 0 and not re.findall(_msgbeg, _msgarray[i]):
                 return 0
-            elif i !=(count($msgarray)-1) and not re.findall(_msgmid, _msgarray[i])):
+            elif i != len(_msgarray)-1 and not re.findall(_msgmid, _msgarray[i]):
                 return 0
-            elif not re.findall(_msgend, _msgarray[i])):
+            elif not re.findall(_msgend, _msgarray[i]):
                 return 0
         return 1
     elif re.findall(_msgregex, _msg):
@@ -35,34 +40,33 @@ def msgcheck(msg):
 
 def enterchat(name, nick, key):
     #global $data, $_SESSION;name = name.lower();
-    self.session['name'] = 's'+ $name 
+    self.session['name'] = 's'+ name 
     if os.path.isfile(CHAT_LOGS + name):
         chat = open(CHAT_LOGS + name, 'r+b')
         chat = chat.readlines()
-    if not self.session['nick']):
-        if not getpeople(chat) and in_array($nick, getpeople($chat))) {
+    if not self.session['nick']:
+        if not getpeople(chat) and in_array(nick, getpeople(chat)):
             print "error"
             return
         else:
             self.session['nick'] = nick
             self.session['check'] = 'OK'
-            chat[0] = chat[0].strip() + nick + ':' + $key + "|\n"
+            chat[0] = chat[0].strip() + nick + ':' + key + "|\n"
             chat[len(chat)] = '> ' + nick + " has arrived\n"
-            file_put_contents($data.$name, implode('', $chat), LOCK_EX)
-            _log_it = os.open(CHAT_LOGS + _post_name, os.O_EXLOCK )
+            _log_it = os.open(CHAT_LOGS + name, os.O_EXLOCK )
             os.write(_log_it, ''.join(chat))
             os.close(_log_it)
             self.session['pos'] = len(open(CHAT_LOGS + name).readlines()) - 1
 
 def chat(name):
-    global $data, $nicks, $timelimit, $maxinput, $install, $_SESSION, $genurl, $filesize;
+    #global $data, $nicks, $timelimit, $maxinput, $install, $_SESSION, $genurl, $filesize;
     name = name.lower();
     _datafile = open(CHAT_LOGS + name)
     _chat = _datafile.readlines()
     _datafile.close()
-    _nickname = NICKNAMES[mt_rand(0, len(NICKNAMES) - 1)];
-    while (in_array(_nickname, getpeople(_chat))) {
-        _nickname = NICKNAMES[mt_rand(0, len(NICKNAMES) - 1)];
+    _nickname = NICKNAMES[random.randrange(0, len(NICKNAMES) - 1)]
+    while findInList(_nickname, getpeople(_chat)):
+        _nickname = NICKNAMES[random.randrange(0, len(NICKNAMES) - 1)]
     #template loader
             
 def logout(name, nick, ghost):

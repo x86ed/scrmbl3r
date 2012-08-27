@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 class HTTPSMixin(object):
     def is_secure(self):
         return self.request.headers.get('X-Scheme') == 'https'
@@ -17,6 +19,7 @@ class HTTPSMixin(object):
             return 'https://%s%s' % (parsed.netloc, url)
         else:
             return url.replace('http://', 'https://')
+
 def findInList(f, seq):
   """Return first item in sequence where f(item) == True."""
   for item in seq:

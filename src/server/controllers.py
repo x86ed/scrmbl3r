@@ -4,8 +4,11 @@ import cgi
 import io
 import os
 import re
+import session
 import time
 import tornado.web
+
+from helpers import HTTPSMixin, findInList
 
 
 class SSLController(tornado.web.RequestHandler, HTTPSMixin):
@@ -16,13 +19,13 @@ class SSLController(tornado.web.RequestHandler, HTTPSMixin):
             return self.redirect(self.httpify_url('/not_allowed_https/'))
 
 class MainController(tornado.web.RequestHandler):
-    self.session = session.TornadoSession(self.application.session_manager, self)
     def get(self):
         _get_c = self.get_arguments('c')
+        print _get_c
         _post_logout = self.get_arguments('logout')
         _made_of_chars = '^\w+$'
-        if _get_c in Locals():
-            if re.findall(_made_of_chars, _get_c):
+        if _get_c:
+            if re.findall(_made_of_chars, _get_c[0]):
                 if len(_get_c) <= 32:
                     chat(_get_c);
                 else:
@@ -38,6 +41,7 @@ class MainController(tornado.web.RequestHandler):
                 welcome('name your chat')
 
     def post(self):
+        self.session = session.TornadoSession(self.application.session_manager, self)
         _valid_nick= '^[a-z]{1,12}$'
         _made_of_chars = '^\w+$'
         _valid_key = '^(\w|\/|\+|\?|\(|\)|\=)+$'
@@ -48,10 +52,10 @@ class MainController(tornado.web.RequestHandler):
         _post_chat = self.get_arguments('chat')
         _post_input = self.get_arguments('input')
         if re.findall(_valid_nick, _post_nick) and re.findall(_made_of_chars, _post_name) and re.findall(_valid_key, _post_key):
-           _post_name = _post_name.lower()
-           self.session['name'] = 's' + _post_name
-           self.save()
-           if os.path.isfile(CHAT_LOGS + _post_name):
+            _post_name = _post_name.lower()
+            self.session['name'] = 's' + _post_name
+            self.save()
+            if os.path.isfile(CHAT_LOGS + _post_name):
                 _chatStat = os.stat(CHAT_LOGS + _post_name)
                 chat = open(CHAT_LOGS + _post_name, "rb+")
                 _timestamp = int(time.time())
@@ -61,7 +65,7 @@ class MainController(tornado.web.RequestHandler):
                     enterchat(_post_name,_post_nick,_post_key)
                     return
             if _post_key == 'get' and self.session['check'] == 'OK':
-                print  chat.readline().strip()
+                print chat.readline().strip()
                 return
             if len(getpeople(chat)) >= MAXIMUM_USERS:
                 print 'full'
@@ -97,15 +101,15 @@ class MainController(tornado.web.RequestHandler):
                     _sleepcounter = 0
                     while _pos >= len(chat_list):
                         io.flush()
-                        with open(CHAT_LOGS + _post_chat,'r+b') as _shared_mem
+                        with open(CHAT_LOGS + _post_chat,'r+b') as _shared_mem:
                             if (_sleepcounter % (TIMEOUT / 4)) == 0:
                                 _people = getpeople(chat)
                                 _shm_id = mmap.mmap(_shared_mem.fileno(), 256, ACCESS_WRITE)
                                 if not _shim_id:
                                     _last = []
-                                else {
+                                else:
                                     _last = _shim_id
-                                    for p in range len(_people):
+                                    for p in range(len(_people)):
                                         _timestamp = int(time.time())
                                         if _last[_people[p]] and (_timestamp - TIMEOUT) > _last[_people[p]]:
                                             _last[_people[p]] = []
@@ -123,37 +127,37 @@ class MainController(tornado.web.RequestHandler):
                             chat = open(CHAT_LOGS + _post_chat, 'r+b');
                     if _pos < len(chat_list):
                         if msgcheck(chat_list[_pos]) or re.findall(INFO_REG_EX , chat_list[_pos]):
-                        _match = re.findall('\([a-z]{1,12}\)[^\(^\[]+', chat_list[_pos])
-                        _nick = re.findall('^[a-z]{1,12}\|', chat_list[_pos])
-                        _nick = _nick[0][:-1]
-                        _found = 0
-                        for k in range len(_match[0]):
-                            if _match[0][k][:len(self.session['nick']) + 2] == '(%s)' % self.session['nick']:
-                                _match = _match[0][k][len(self.session['nick']) + 2:]
-                                chat_list[_pos] = re.sub('\[:3\](.*)\[:3\]', '[:3]'._match.'[:3]', chat_list[_pos])
-                                _found = 1
-                                break
-                        if not _nick or _nick != self.session['nick']:
-                            if not _found and re.findall('\[:3\](.*)\[:3\]', chat_list[_pos]):
-                                chat_list[_pos] = '*'
-                            else:
-                                chat_list[_pos] = re.sub('^[a-z]{1,12}\|\w{8}', _nick, chat_list[_pos])
-                            print cgi.escape(chat_list[_pos])
-                        elif re.findall('\|\w{8}', chat_list[_pos]):
-                            _sentid = re.findall('\|\w{8}', chat_list[_pos])
-                            print _sentid[:1]
-        else:
-            print 'NOLOGIN'
-        return
-    elif _post_name and re.findall('^\w+$', _post_name) and len(_post_input) > 6
-        _post_name = _post_name.lower()
-        self.session['name'] = 's' + _post_name
-        self.save()
-        chat = open(CHAT_LOGS + _post_name, "rb+")
-        _thisnick = re.findall('^[a-z]{1,12}\|', _post_input)
-        if msgcheck(_post_input) and  self.session['nick'] == _thisnick[0][0: -1]:
-            if os.path.isfile(CHAT_LOGS + _post_name):
-                _log_it = os.open(CHAT_LOGS + _post_name, os.O_APPEND|os.O_EXLOCK )
-                os.write(_log_it, _post_input+"\n")
-                os.close(_log_it)
-        return
+                            _match = re.findall('\([a-z]{1,12}\)[^\(^\[]+', chat_list[_pos])
+                            _nick = re.findall('^[a-z]{1,12}\|', chat_list[_pos])
+                            _nick = _nick[0][:-1]
+                            _found = 0
+                            for k in range(len(_match[0])):
+                                if _match[0][k][:len(self.session['nick']) + 2] == '(%s)' % self.session['nick']:
+                                    _match = _match[0][k][len(self.session['nick']) + 2:]
+                                    chat_list[_pos] = re.sub('\[:3\](.*)\[:3\]', '[:3]' + _match + '[:3]', chat_list[_pos])
+                                    _found = 1
+                                    break
+                            if not _nick or _nick != self.session['nick']:
+                                if not _found and re.findall('\[:3\](.*)\[:3\]', chat_list[_pos]):
+                                    chat_list[_pos] = '*'
+                                else:
+                                    chat_list[_pos] = re.sub('^[a-z]{1,12}\|\w{8}', _nick, chat_list[_pos])
+                                print cgi.escape(chat_list[_pos])
+                            elif re.findall('\|\w{8}', chat_list[_pos]):
+                                _sentid = re.findall('\|\w{8}', chat_list[_pos])
+                                print _sentid[:1]
+            else:
+                print 'NOLOGIN'
+            return
+        elif _post_name and re.findall('^\w+$', _post_name) and len(_post_input) > 6:
+            _post_name = _post_name.lower()
+            self.session['name'] = 's' + _post_name
+            self.save()
+            chat = open(CHAT_LOGS + _post_name, "rb+")
+            _thisnick = re.findall('^[a-z]{1,12}\|', _post_input)
+            if msgcheck(_post_input) and  self.session['nick'] == _thisnick[0][0: -1]:
+                if os.path.isfile(CHAT_LOGS + _post_name):
+                    _log_it = os.open(CHAT_LOGS + _post_name, os.O_APPEND|os.O_EXLOCK )
+                    os.write(_log_it, _post_input+"\n")
+                    os.close(_log_it)
+            return

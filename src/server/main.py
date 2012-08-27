@@ -8,10 +8,11 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.template
 import tornado.web
-import httpsify
+import helpers
 import session
-import controllers
 import chat
+
+from controllers import SSLController, MainController
 
 DOMAIN = 'encom511.local'
 INSTALL = 'https://%s/' % DOMAIN
@@ -25,6 +26,10 @@ SSL = True # formerly HTTPS
 CHAT_LOGS = '/Users/laszlototh/Desktop/repos/git/cryptocat/data' #formerly data
  # directory for ssl certs
 CERT_DIR = '/Users/laszlototh/Desktop/repos/git/cryptocat/certs'
+# directory for sessions
+SESSION_DIR = '/Users/laszlototh/Desktop/repos/git/cryptocat/sessions'
+# session secret
+SESSION_SECRET = "somethingreallyawesome"
  # Maximum users in a chat. Untested above 10.
 MAXIMUM_USERS = 12
  # Maximum characters per line (soft limit.)
@@ -43,22 +48,24 @@ TIMEOUT = 80
 
  # Do _not_ touch anything below this line.
 
-HTTP_SERVER = tornado.httpserver.HTTPServer(application)
-REDIRECT_SERVER = tornado.httpserver.HTTPServer(redirector)
-HTTPS_SERVER = tornado.httpserver.HTTPServer(application, ssl_options={"certfile": os.path.join(CERT_DIR, "certificate.pem"),"keyfile": os.path.join(CERT_DIR, "privatekey.pem"),})
-
 application = tornado.web.Application([
     (r"/", MainController),
 ])
+
+application.session_manager = session.TornadoSessionManager(SESSION_SECRET, SESSION_DIR)
 
 redirector = tornado.web.Application([
     (r"/", SSLController),
 ])
 
+HTTP_SERVER = tornado.httpserver.HTTPServer(application)
+REDIRECT_SERVER = tornado.httpserver.HTTPServer(redirector)
+HTTPS_SERVER = tornado.httpserver.HTTPServer(application, ssl_options={"certfile": os.path.join(CERT_DIR, "certificate.pem"),"keyfile": os.path.join(CERT_DIR, "privatekey.pem"),})
+
 SESSION_ENTROPY_LENGTH = 1024
 INFO_REG_EX = '(\>|\<)\s[a-z]{1,12}\shas\s(arrived|left)'
 
-def main(){
+def main():
     if SSL:
         REDIRECT_SERVER.listen(80)
     else:
