@@ -16,6 +16,7 @@ class SSLController(tornado.web.RequestHandler, HTTPSMixin):
             return self.redirect(self.httpify_url('/not_allowed_https/'))
 
 class MainController(tornado.web.RequestHandler):
+    self.session = session.TornadoSession(self.application.session_manager, self)
     def get(self):
         _get_c = self.get_arguments('c')
         _post_logout = self.get_arguments('logout')
