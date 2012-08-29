@@ -30,6 +30,8 @@ CERT_DIR = '/Users/laszlototh/Desktop/repos/git/cryptocat/certs'
 SESSION_DIR = '/Users/laszlototh/Desktop/repos/git/cryptocat/sessions'
 # session secret
 SESSION_SECRET = "somethingreallyawesome"
+ # session random number seed length (not currently used)
+SESSION_ENTROPY_LENGTH = 1024
  # Maximum users in a chat. Untested above 10.
 MAXIMUM_USERS = 12
  # Maximum characters per line (soft limit.)
@@ -45,6 +47,8 @@ AUTO_GENERATE_URLS = True
 NICKNAMES = ['bunny', 'kitty', 'pony', 'puppy', 'squirrel', 'sparrow', 'turtle', 'kiwi', 'fox', 'owl', 'raccoon', 'koala', 'echidna', 'panther', 'sprite', 'ducky']
  # Timeout rate. You probably shouldn't touch this.
 TIMEOUT = 80
+ # regexp used for isaying if user is in chat or no
+INFO_REG_EX = '(\>|\<)\s[a-z]{1,12}\shas\s(arrived|left)'
 
  # Do _not_ touch anything below this line.
 
@@ -61,9 +65,6 @@ redirector = tornado.web.Application([
 HTTP_SERVER = tornado.httpserver.HTTPServer(application)
 REDIRECT_SERVER = tornado.httpserver.HTTPServer(redirector)
 HTTPS_SERVER = tornado.httpserver.HTTPServer(application, ssl_options={"certfile": os.path.join(CERT_DIR, "certificate.pem"),"keyfile": os.path.join(CERT_DIR, "privatekey.pem"),})
-
-SESSION_ENTROPY_LENGTH = 1024
-INFO_REG_EX = '(\>|\<)\s[a-z]{1,12}\shas\s(arrived|left)'
 
 def main():
     if SSL:
