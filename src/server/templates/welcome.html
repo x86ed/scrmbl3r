@@ -1,6 +1,8 @@
+{% extends "index.html" %}
+{% block welcome %}
 <div id="main">
     <a href="https://project.crypto.cat"><img src="img/cryptocat.png" alt="cryptocat" class="cryptocat" /></a>
-    <form action="{{ escape(path) }}" method="get" class="create" id="welcome">
+    <form action="{{ escape(install) }}" method="get" class="create" id="welcome">
         <div id="front" class="invisible">
             <div id="note">
                 <div id="notetext">
@@ -53,3 +55,4 @@
     </div>
 </div>
 <script type="text/javascript" src="js/welcome.js"></script>
+{% end %}

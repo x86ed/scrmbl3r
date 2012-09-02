@@ -11,6 +11,7 @@ import tornado.web
 from helpers import HTTPSMixin, findInList
 from chat import chat, getpeople, msgcheck, enterchat, chat, logout
 
+import config
 
 class SSLController(tornado.web.RequestHandler, HTTPSMixin):
     def get(self):
@@ -28,18 +29,19 @@ class MainController(tornado.web.RequestHandler):
         if _get_c:
             if re.findall(_made_of_chars, _get_c[0]):
                 if len(_get_c) <= 32:
-                    chat(_get_c);
+                    responseList = chat(_get_c)
+                    self.render(responseList[0],install=responseList[1], nick=responseList[2], name=responseList[3], maxinput=responseList[4]) 
                 else:
-                    welcome('chat name too large')
+                    self.render('welcome.html',install=config.INSTALL,name='chat name too large')
             else:
-                welcome('letters and numbers only')
+                self.render('welcome.html',install=config.INSTALL,name='letters and numbers only')
         elif _post_logout and  re.findall(_made_of_chars, _post_logout):
                 self.session['name'] ='s' + _post_logout
                 self.save()
                 logout(_post_logout, self.session['nick'], 0)
-                welcome('name your chat')
+                self.render('welcome.html',install=config.INSTALL,name='name your chat')
         else:
-                welcome('name your chat')
+                self.render('welcome.html',install=config.INSTALL,name='name your chat')
 
     def post(self):
         self.session = session.TornadoSession(self.application.session_manager, self)
@@ -56,19 +58,19 @@ class MainController(tornado.web.RequestHandler):
             _post_name = _post_name.lower()
             self.session['name'] = 's' + _post_name
             self.save()
-            if os.path.isfile(CHAT_LOGS + _post_name):
-                _chatStat = os.stat(CHAT_LOGS + _post_name)
-                chat = open(CHAT_LOGS + _post_name, "rb+")
+            if os.path.isfile(config.CHAT_LOGS + _post_name):
+                _chatStat = os.stat(config.CHAT_LOGS + _post_name)
+                chat = open(config.CHAT_LOGS + _post_name, "rb+")
                 _timestamp = int(time.time())
                 if _timestamp - int(_chatStat.st_mtime) > TIME_LIMIT:
                     chat.close()
-                    os.remove(CHAT_LOGS + _post_name)
+                    os.remove(config.CHAT_LOGS + _post_name)
                     enterchat(_post_name,_post_nick,_post_key)
                     return
             if _post_key == 'get' and self.session['check'] == 'OK':
                 print chat.readline().strip()
                 return
-            if len(getpeople(chat)) >= MAXIMUM_USERS:
+            if len(getpeople(chat)) >= config.MAXIMUM_USERS:
                 print 'full'
                 return
             elif findInList(_post_nick,getpeople(chat)):
@@ -79,8 +81,8 @@ class MainController(tornado.web.RequestHandler):
                 self.session.destroy()
             if not hasattr(self.session,'nick'):
                 enterchat(_post_name,_post_nick,_post_key)
-                if not os.path.isfile(CHAT_LOGS + _post_name):
-                    chat = open(CHAT_LOGS + _post_name, 'w+')
+                if not os.path.isfile(config.CHAT_LOGS + _post_name):
+                    chat = open(config.CHAT_LOGS + _post_name, 'w+')
             else:
                 print 'error'
             return
@@ -92,18 +94,18 @@ class MainController(tornado.web.RequestHandler):
             self.session['name'] = 's' + _post_chat
             self.save()
             if self.session['check'] == 'OK':
-                if not os.path.isfile(CHAT_LOGS + _post_chat):
+                if not os.path.isfile(config.CHAT_LOGS + _post_chat):
                     print 'NOEXIST'
                     return
                 else:
-                    chat = open(CHAT_LOGS + _post_chat, "rb+")
+                    chat = open(config.CHAT_LOGS + _post_chat, "rb+")
                     chat_list = chat.readlines() 
                     _pos = self.session['pos'] + int(_post_pos)
                     _sleepcounter = 0
                     while _pos >= len(chat_list):
                         io.flush()
-                        with open(CHAT_LOGS + _post_chat,'r+b') as _shared_mem:
-                            if (_sleepcounter % (TIMEOUT / 4)) == 0:
+                        with open(config.CHAT_LOGS + _post_chat,'r+b') as _shared_mem:
+                            if (_sleepcounter % (config.TIMEOUT / 4)) == 0:
                                 _people = getpeople(chat)
                                 _shm_id = mmap.mmap(_shared_mem.fileno(), 256, ACCESS_WRITE)
                                 if not _shim_id:
@@ -125,7 +127,7 @@ class MainController(tornado.web.RequestHandler):
                             #}
                             time.sleep(1)
                             _sleepcounter += 1;
-                            chat = open(CHAT_LOGS + _post_chat, 'r+b');
+                            chat = open(config.CHAT_LOGS + _post_chat, 'r+b');
                     if _pos < len(chat_list):
                         if msgcheck(chat_list[_pos]) or re.findall(INFO_REG_EX , chat_list[_pos]):
                             _match = re.findall('\([a-z]{1,12}\)[^\(^\[]+', chat_list[_pos])
@@ -154,11 +156,11 @@ class MainController(tornado.web.RequestHandler):
             _post_name = _post_name.lower()
             self.session['name'] = 's' + _post_name
             self.save()
-            chat = open(CHAT_LOGS + _post_name, "rb+")
+            chat = open(config.CHAT_LOGS + _post_name, "rb+")
             _thisnick = re.findall('^[a-z]{1,12}\|', _post_input)
             if msgcheck(_post_input) and  self.session['nick'] == _thisnick[0][0: -1]:
-                if os.path.isfile(CHAT_LOGS + _post_name):
-                    _log_it = os.open(CHAT_LOGS + _post_name, os.O_APPEND|os.O_EXLOCK )
+                if os.path.isfile(config.CHAT_LOGS + _post_name):
+                    _log_it = os.open(config.CHAT_LOGS + _post_name, os.O_APPEND|os.O_EXLOCK )
                     os.write(_log_it, _post_input+"\n")
                     os.close(_log_it)
             return

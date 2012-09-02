@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <head>
-	<?php
-		if (isset($_GET['c']) && preg_match('/^\w+$/', $_GET['c'])) {
-			print('<meta name="robots" content="noindex, nofollow" />'."\n");
-		}
-	?>
+	<meta name="robots" content="noindex, nofollow" />
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0;" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,36 +8,6 @@
 	<meta name="description" content="Cryptocat lets you instantly set up secure conversations. It's an open source encrypted, private alternative to other services such as Facebook chat." />
 	<meta name="keywords" content="encrypted chat, private chat, secure chat, cryptocat" />
 	<title>Cryptocat</title>
-	<?php
-		$mobile = 0;
-		$agent = $_SERVER['HTTP_USER_AGENT'];
-		$strmobile = array('iPhone', 'iPod', 'BlackBerry', 'Windows Phone', 
-		'Fennec', 'Opera Mini', 'Opera Mobi', 'MeeGo');
-		for ($i=0; $i != count($strmobile); $i++) {
-			if (strstr($agent, $strmobile[$i]) || (strstr($agent, 'Android') && strstr($agent, 'Mobile'))) {
-				$mobile = 1;
-			}
-		}
-		if ($mobile) {
-			print('<link rel="stylesheet" href="css/mobile.css" type="text/css" />'."\n");
-		}
-		else {
-			print('<link rel="stylesheet" href="css/style.css" type="text/css" />'."\n");
-		}
-		if (isset($_GET['redirect']) && preg_match('/((mailto\:|(news|(ht|f)tp(s?))\:\/\/){1}\S+)/i', $_GET['redirect'])) {
-			print('</head>
-			<body><div class="redirect"><img src="img/cryptocat.png" alt="" />
-			You are leaving Cryptocat to visit: <p>
-			<a href="'.htmlspecialchars($_GET['redirect']).'">'.htmlspecialchars($_GET['redirect']).'</a>
-			</p>Click the link to continue.</div></body></html>');
-			exit;
-		}
-		if (isset($_GET['close'])) {
-			print('</head>
-			<body>Please close me!</body></html>');
-			exit;
-		}
-	?>
 	<link rel="icon" type="image/gif" href="img/favicon.gif" />
 	<link rel="apple-touch-startup-image" type="image/png" href="img/isplash.png" />
 	<link rel="apple-touch-icon" type="image/png" href="img/ios.png"/>
@@ -49,15 +15,8 @@
 	<script type="text/javascript" src="js/notification.js"></script>
 	<script type="text/javascript" src="js/build.js"></script>
 </head>
-<?php
-if (isset($_GET['c']) && preg_match('/^\w+$/', $_GET['c'])) {
-	print('<body>'."\n");
-}
-else {
-	print('<body onload="document.getElementById(\'c\').focus();">'."\n");
-}
-?>
-{{ chat }}
-{{ welcome }}
+<body>
+{% block chat %}{% end %}
+{% block welcome %}{% end %}
 </body>
 </html>

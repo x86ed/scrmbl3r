@@ -6,12 +6,18 @@ import re
 
 from helpers import findInList
 
+import config
+
 def getpeople(chat):
     _people_re = re.compile('[a-z]{1,12}:')
-    people = re.findall(_people_re, chat[0])
-    for i in range(len(people[0])):
-        people[0][i] = people[0][i][:-1]
-    return people[0]
+    if chat:
+        people = re.findall(_people_re, chat[0])
+        if people:
+            for i in range(len(people[0])):
+                people[0][i] = people[0][i][:-1]
+            return people[0]
+    else:
+        return [0]
 
 def msgcheck(msg):
     _msgarray = []
@@ -34,15 +40,11 @@ def msgcheck(msg):
         return 1
     return 0
 
-#def welcome(name):
-#           global INSTALL;
-#           template that uses INSTALL and name
-
 def enterchat(name, nick, key):
     #global $data, $_SESSION;name = name.lower();
     self.session['name'] = 's'+ name 
-    if os.path.isfile(CHAT_LOGS + name):
-        chat = open(CHAT_LOGS + name, 'r+b')
+    if os.path.isfile(config.CHAT_LOGS + name):
+        chat = open(config.CHAT_LOGS + name, 'r+b')
         chat = chat.readlines()
     if not self.session['nick']:
         if not getpeople(chat) and in_array(nick, getpeople(chat)):
@@ -53,29 +55,29 @@ def enterchat(name, nick, key):
             self.session['check'] = 'OK'
             chat[0] = chat[0].strip() + nick + ':' + key + "|\n"
             chat[len(chat)] = '> ' + nick + " has arrived\n"
-            _log_it = os.open(CHAT_LOGS + name, os.O_EXLOCK )
+            _log_it = os.open(config.CHAT_LOGS + name, os.O_EXLOCK )
             os.write(_log_it, ''.join(chat))
             os.close(_log_it)
-            self.session['pos'] = len(open(CHAT_LOGS + name).readlines()) - 1
+            self.session['pos'] = len(open(config.CHAT_LOGS + name).readlines()) - 1
 
 def chat(name):
     #global $data, $nicks, $timelimit, $maxinput, $install, $_SESSION, $genurl, $filesize;
-    global CHAT_LOGS, NICKNAMES
+    #global config.CHAT_LOGS, config.NICKNAMES
     name = ''.join(name)
     name = name.lower();
-    _datafile = open(CHAT_LOGS + name)
+    _datafile = open(config.CHAT_LOGS + name, 'w+')
     _chat = _datafile.readlines()
     _datafile.close()
-    _nickname = NICKNAMES[random.randrange(0, len(NICKNAMES) - 1)]
-    while findInList(_nickname, getpeople(_chat)):
-        _nickname = NICKNAMES[random.randrange(0, len(NICKNAMES) - 1)]
-    #template loader
+    _nickname = config.NICKNAMES[random.randrange(0, len(config.NICKNAMES) - 1)]
+    while _nickname in getpeople(_chat):
+        _nickname = config.NICKNAMES[random.randrange(0, len(config.NICKNAMES) - 1)]
+    return ["chat.html", config.INSTALL, _nickname, name, str(config.MAXIMUM_MESSAGE_LENGTH)]
             
 def logout(name, nick, ghost):
     name = name.lower()
     self.session['name'] = 's'+ name
     if  self.session['check'] == "OK":
-        chat = open(CHAT_LOGS + name, 'r+b')
+        chat = open(config.CHAT_LOGS + name, 'r+b')
         chat = chat.readlines()
         _public = re.findall(nick + '\:[^\|]+\|', chat[0])
         chat[0] = chat[0].replace(_public[0], '')
@@ -83,7 +85,7 @@ def logout(name, nick, ghost):
         if not ghost:
             self.session.unset()
             self.session.destroy()
-        if os.path.isfile(CHAT_LOGS + name):
-            _log_it = os.open(CHAT_LOGS + name, os.O_EXLOCK )
+        if os.path.isfile(config.CHAT_LOGS + name):
+            _log_it = os.open(config.CHAT_LOGS + name, os.O_EXLOCK )
             os.write(_log_it, ''.join(chat))
             os.close(_log_it)

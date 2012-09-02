@@ -1,3 +1,5 @@
+{% extends "index.html" %}
+{% block chat %}
 <div id="main">
     <div id="front">
         <div id="changenick">
@@ -7,9 +9,9 @@
             </div>
             <div id="nickentry" class="invisible">
                 <p>Enter nickname</p>
-                <form name="nickform" id="nickform" method="post" action="'.$install.'">
+                <form name="nickform" id="nickform" method="post" action="{{ escape(install) }}">
                     <div>
-                        <input type="text" name="nickinput" id="nickinput" value="'.$nick.'" maxlength="12" autocomplete="off" />
+                        <input type="text" name="nickinput" id="nickinput" value="{{ escape(nick) }}" maxlength="12" autocomplete="off" />
                         <input type="submit" class="nicksubmit" value="chat" />
                     </div>
                 </form>
@@ -17,22 +19,23 @@
         </div>
         <div id="fadebox" class="invisible"></div>
     </div>
-    <a href="'.$install.'"><img src="img/cryptocat.png" class="chat" alt="cryptocat" /></a>
+    <a href="{{ escape(install) }}"><img src="img/cryptocat.png" class="chat" alt="cryptocat" /></a>
     <img src="img/maximize.png" alt="maximize" id="maximize" title="Expand" />
     <img src="img/invite.png" alt="invite" id="invite" title="Invite friend" />
     <img src="img/nonotifications.png" alt="notifications" id="notifications" title="Desktop notifications off" />
     <img src="img/nosound.png" alt="sound" id="sound" title="Message sounds off" />
     <img src="img/filer.png" alt="file" id="file" title="Send encrypted file" />
     <div id="inchat"><div id="chat"></div></div>
-    <div id="info">chatting as <span id="nick">'.$nick.'</span> on 
-    <strong class="blue">'.$install.'?c=</strong><strong id="name">'.$name.'</strong>
+    <div id="info">chatting as <span id="nick">{{ escape(nick) }}</span> on 
+    <strong class="blue">{{ escape(install) }}?c=</strong><strong id="name">{{ escape(name) }}</strong>
     </div>
-    <form name="chatform" id="chatform" method="post" action="'.$install.'">
+    <form name="chatform" id="chatform" method="post" action="{{ escape(install) }}">
         <div>
             <div id="users"></div>
-            <input type="text" name="input" id="input" maxlength="'.$maxinput.'" autocomplete="off" />
-            <input type="submit" name="talk" id="talk" value="'.$maxinput.'" />
+            <input type="text" name="input" id="input" maxlength="{{ escape(maxinput) }}" autocomplete="off" />
+            <input type="submit" name="talk" id="talk" value="{{ escape(maxinput) }}" />
         </div>
     </form>
 </div>
 <script type="text/javascript" src="js/cat.js"></script>
+{% end %}
