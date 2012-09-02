@@ -60,6 +60,8 @@ def enterchat(name, nick, key):
 
 def chat(name):
     #global $data, $nicks, $timelimit, $maxinput, $install, $_SESSION, $genurl, $filesize;
+    global CHAT_LOGS, NICKNAMES
+    name = ''.join(name)
     name = name.lower();
     _datafile = open(CHAT_LOGS + name)
     _chat = _datafile.readlines()

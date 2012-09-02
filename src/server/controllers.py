@@ -9,6 +9,7 @@ import time
 import tornado.web
 
 from helpers import HTTPSMixin, findInList
+from chat import chat, getpeople, msgcheck, enterchat, chat, logout
 
 
 class SSLController(tornado.web.RequestHandler, HTTPSMixin):
