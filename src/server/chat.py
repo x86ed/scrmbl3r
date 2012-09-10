@@ -40,25 +40,31 @@ def msgcheck(msg):
         return 1
     return 0
 
-def enterchat(name, nick, key):
+def enterchat(name, nick, key,self):
     #global $data, $_SESSION;name = name.lower();
     self.session['name'] = 's'+ name 
     if os.path.isfile(config.CHAT_LOGS + name):
         chat = open(config.CHAT_LOGS + name, 'r+b')
-        chat = chat.readlines()
-    if not self.session['nick']:
-        if not getpeople(chat) and in_array(nick, getpeople(chat)):
-            print "error"
+        _chat_lines = chat.readlines()
+    if not hasattr(self.session,'nick'):
+        if not getpeople(_chat_lines) and in_array(nick, getpeople(_chat_lines)):
+            self.write("error")
             return
         else:
             self.session['nick'] = nick
             self.session['check'] = 'OK'
-            chat[0] = chat[0].strip() + nick + ':' + key + "|\n"
-            chat[len(chat)] = '> ' + nick + " has arrived\n"
+            if not _chat_lines:
+                 _chat_lines.append(nick + ':' + key + "|\n")
+            else:
+                _chat_lines[0] = _chat_lines[0].strip() + nick + ':' + key + "|\n"
+            _chat_lines.append('> ' + nick + " has arrived\n")
             _log_it = os.open(config.CHAT_LOGS + name, os.O_EXLOCK )
-            os.write(_log_it, ''.join(chat))
+            print str(_log_it) + '\n'
+            print ''.join(_chat_lines) + '\n'
+            os.write(_log_it, ''.join(_chat_lines))
             os.close(_log_it)
             self.session['pos'] = len(open(config.CHAT_LOGS + name).readlines()) - 1
+    self.session.save()
 
 def chat(name):
     #global $data, $nicks, $timelimit, $maxinput, $install, $_SESSION, $genurl, $filesize;
@@ -81,7 +87,7 @@ def logout(name, nick, ghost):
         chat = chat.readlines()
         _public = re.findall(nick + '\:[^\|]+\|', chat[0])
         chat[0] = chat[0].replace(_public[0], '')
-        chat[len(chat)+1] = '< '+ nick + " has left\n"
+        chat.append('< '+ nick + " has left\n")
         if not ghost:
             self.session.unset()
             self.session.destroy()

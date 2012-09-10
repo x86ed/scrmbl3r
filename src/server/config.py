@@ -7,13 +7,15 @@ INSTALL = 'https://%s/' % DOMAIN
  # a Tor Hidden Service.
 SSL = True # formerly HTTPS
  # Chat storage directory. Needs to be writable by web server.
-CHAT_LOGS = '/Users/laszlototh/Desktop/repos/git/cryptocat/data' #formerly data
+CHAT_LOGS = '/Users/laszlototh/Desktop/repos/git/cryptocat/data/' #formerly data
  # directory for ssl certs
-CERT_DIR = '/Users/laszlototh/Desktop/repos/git/cryptocat/certs'
+CERT_DIR = '/Users/laszlototh/Desktop/repos/git/cryptocat/certs/'
 # directory for sessions
-SESSION_DIR = '/Users/laszlototh/Desktop/repos/git/cryptocat/sessions'
+SESSION_DIR = '/Users/laszlototh/Desktop/repos/git/cryptocat/sessions/'
 # directory for templates
-TEMPLATE_DIR = '/Users/laszlototh/Desktop/repos/git/scrmbl3r/src/server/templates'
+TEMPLATE_DIR = '/Users/laszlototh/Desktop/repos/git/scrmbl3r/src/server/templates/'
+# static file path
+STATIC_PATH = '/Users/laszlototh/Desktop/repos/git/scrmbl3r/src/server/'
 # session secret
 SESSION_SECRET = "somethingreallyawesome"
  # session random number seed length (not currently used)

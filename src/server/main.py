@@ -19,17 +19,22 @@ import config
  # Do _not_ touch anything below this line.
 
 settings = dict(
-        template_path=config.TEMPLATE_DIR
+        template_path=config.TEMPLATE_DIR,
+        cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo="
 )
 
 application = tornado.web.Application(
     [
+        (r'(/favicon.ico)', tornado.web.StaticFileHandler, {'path': os.path.join(config.STATIC_PATH, 'img')}),
+        (r'/css/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(config.STATIC_PATH, 'css')}),
+        (r'/img/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(config.STATIC_PATH, 'img')}),
+        (r'/js/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(config.STATIC_PATH, 'js')}),
         (r"/", MainController),
     ],
     **settings
 )
 
-application.session_manager = session.TornadoSessionManager(config.SESSION_SECRET, config.SESSION_DIR)
+application.session_manager = session.TornadoSessionManager(config.SESSION_SECRET,config.SESSION_DIR)
 
 redirector = tornado.web.Application([
     (r"/", SSLController),
